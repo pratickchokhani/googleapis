@@ -644,6 +644,7 @@ message ExecuteSqlRequest {
   // Common options for this request.
   RequestOptions request_options = 11;
 
+  bool autocommit = 12;
   // If this is for a partitioned query and this field is set to `true`, the
   // request will be executed via Spanner independent compute resources.
   //
