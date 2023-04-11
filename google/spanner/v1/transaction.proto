@@ -475,6 +475,22 @@ message TransactionOptions {
     // on the `session` resource.
     ReadOnly read_only = 2;
   }
+
+
+  // Message type to initiate a Partitioned DML transaction.
+  message TransactionId {
+    // If true, the Cloud Spanner-selected read timestamp is included in
+    // the [Transaction][] message that describes the transaction.
+    // (-- api-linter: core::0142::time-field-type=disabled
+    //     aip.dev/not-precedent: This does not represent a timestamp. --)
+
+    // Session generation.
+    uint32 generation = 2;
+    // Transaction sequence number.
+    uint32 sequence = 3;
+  }
+
+  TransactionId transaction_id = 4;
 }
 
 // A transaction.
