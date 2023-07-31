@@ -378,6 +378,9 @@ message TransactionOptions {
 
     // Read lock mode for the transaction.
     ReadLockMode read_lock_mode = 1;
+    // Identity of the transaction to be created. Applicable only for begin or
+    // inline begin requests. All subsequent requests should use `id`
+    bytes next_transaction_token = 2;
   }
 
   // Message type to initiate a Partitioned DML transaction.
@@ -496,6 +499,11 @@ message Transaction {
   // A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
   // Example: `"2014-10-02T15:01:23.045123456Z"`.
   google.protobuf.Timestamp read_timestamp = 2;
+  // Token used to identify the transaction to be created next. Used in
+  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
+  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
+  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
+  bytes next_transaction_token = 3;
 }
 
 // This message is used to select the transaction in which a
