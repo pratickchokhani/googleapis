@@ -54,6 +54,11 @@ message ResultSet {
   // Other fields may or may not be populated, based on the
   // [ExecuteSqlRequest.query_mode][google.spanner.v1.ExecuteSqlRequest.query_mode].
   ResultSetStats stats = 3;
+
+  // When [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] is called with
+  // [ExecuteSqlRequest.autocommit][] set to true, the returned ResultSet
+  // will include a CommitResponse.
+  CommitResponse commit_response = 4;
 }
 
 // Partial results from a streaming read or SQL query. Streaming reads and
@@ -158,6 +163,12 @@ message PartialResultSet {
   // This field will also be present in the last response for DML
   // statements.
   ResultSetStats stats = 5;
+
+  // When [ExecuteStreamingSql][google.spanner.v1.Spanner.ExecuteSql] is called
+  // with [ExecuteSqlRequest.autocommit][] set to true, the last
+  // PartialResultSet message in the streaming response will contain a
+  // CommitResponse.
+  CommitResponse commit_response = 6;
 }
 
 // Metadata about a [ResultSet][google.spanner.v1.ResultSet] or [PartialResultSet][google.spanner.v1.PartialResultSet].
@@ -187,11 +198,6 @@ message ResultSetMetadata {
   //       { "name": "UserName", "type": { "code": "STRING" } },
   //     ]
   StructType undeclared_parameters = 3;
-
-  // When [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] is called with
-  // [ExecuteSqlRequest.autocommit][] set to true, the returned ResultSet
-  // will include a CommitResponse.
-  CommitResponse commit_response = 4;
 }
 
 // Additional statistics about a [ResultSet][google.spanner.v1.ResultSet] or [PartialResultSet][google.spanner.v1.PartialResultSet].
