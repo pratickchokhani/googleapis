@@ -186,6 +186,11 @@ message ResultSetMetadata {
   //       { "name": "UserName", "type": { "code": "STRING" } },
   //     ]
   StructType undeclared_parameters = 3;
+
+  // When [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] is called with
+  // [ExecuteSqlRequest.autocommit][] set to true, the returned ResultSet
+  // will include a CommitResponse.
+  CommitResponse commit_response = 4;
 }
 
 // Additional statistics about a [ResultSet][google.spanner.v1.ResultSet] or [PartialResultSet][google.spanner.v1.PartialResultSet].
