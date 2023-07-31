@@ -124,7 +124,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -159,19 +158,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "apigeeregistry_go_gapic_test",
-    srcs = [":apigeeregistry_go_gapic_srcjar_test"],
-    embed = [":apigeeregistry_go_gapic"],
-    importpath = "cloud.google.com/go/apigeeregistry/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-apigeeregistry-v1-go",
     deps = [
         ":apigeeregistry_go_gapic",
         ":apigeeregistry_go_gapic_srcjar-metadata.srcjar",
+        ":apigeeregistry_go_gapic_srcjar-snippets.srcjar",
         ":apigeeregistry_go_gapic_srcjar-test.srcjar",
         ":apigeeregistry_go_proto",
     ],
@@ -229,7 +222,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -238,23 +230,15 @@ php_proto_library(
     deps = [":apigeeregistry_proto"],
 )
 
-php_grpc_library(
-    name = "apigeeregistry_php_grpc",
-    srcs = [":apigeeregistry_proto"],
-    deps = [":apigeeregistry_php_proto"],
-)
-
 php_gapic_library(
     name = "apigeeregistry_php_gapic",
     srcs = [":apigeeregistry_proto_with_info"],
     grpc_service_config = "apigeeregistry_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "apigeeregistry_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":apigeeregistry_php_grpc",
-        ":apigeeregistry_php_proto",
-    ],
+    deps = [":apigeeregistry_php_proto"],
 )
 
 # Open Source Packages
@@ -262,7 +246,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-apigeeregistry-v1-php",
     deps = [
         ":apigeeregistry_php_gapic",
-        ":apigeeregistry_php_grpc",
         ":apigeeregistry_php_proto",
     ],
 )

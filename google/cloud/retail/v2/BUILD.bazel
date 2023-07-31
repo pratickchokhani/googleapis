@@ -28,6 +28,8 @@ proto_library(
         "control.proto",
         "control_service.proto",
         "import_config.proto",
+        "model.proto",
+        "model_service.proto",
         "prediction_service.proto",
         "product.proto",
         "product_service.proto",
@@ -110,10 +112,12 @@ java_gapic_test(
     test_classes = [
         "com.google.cloud.retail.v2.CatalogServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.CatalogServiceClientTest",
-        "com.google.cloud.retail.v2.ControlServiceClientHttpJsonTest",
-        "com.google.cloud.retail.v2.ControlServiceClientTest",
         "com.google.cloud.retail.v2.CompletionServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.CompletionServiceClientTest",
+        "com.google.cloud.retail.v2.ControlServiceClientHttpJsonTest",
+        "com.google.cloud.retail.v2.ControlServiceClientTest",
+        "com.google.cloud.retail.v2.ModelServiceClientHttpJsonTest",
+        "com.google.cloud.retail.v2.ModelServiceClientTest",
         "com.google.cloud.retail.v2.PredictionServiceClientHttpJsonTest",
         "com.google.cloud.retail.v2.PredictionServiceClientTest",
         "com.google.cloud.retail.v2.ProductServiceClientHttpJsonTest",
@@ -149,7 +153,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -186,19 +189,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "retail_go_gapic_test",
-    srcs = [":retail_go_gapic_srcjar_test"],
-    embed = [":retail_go_gapic"],
-    importpath = "cloud.google.com/go/retail/apiv2",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-retail-v2-go",
     deps = [
         ":retail_go_gapic",
         ":retail_go_gapic_srcjar-metadata.srcjar",
+        ":retail_go_gapic_srcjar-snippets.srcjar",
         ":retail_go_gapic_srcjar-test.srcjar",
         ":retail_go_proto",
     ],
@@ -248,7 +245,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -257,23 +253,15 @@ php_proto_library(
     deps = [":retail_proto"],
 )
 
-php_grpc_library(
-    name = "retail_php_grpc",
-    srcs = [":retail_proto"],
-    deps = [":retail_php_proto"],
-)
-
 php_gapic_library(
     name = "retail_php_gapic",
     srcs = [":retail_proto_with_info"],
     grpc_service_config = "retail_grpc_service_config.json",
+    migration_mode = "MIGRATION_MODE_UNSPECIFIED",
     rest_numeric_enums = True,
     service_yaml = "retail_v2.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":retail_php_grpc",
-        ":retail_php_proto",
-    ],
+    deps = [":retail_php_proto"],
 )
 
 # Open Source Packages
@@ -281,7 +269,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-retail-v2-php",
     deps = [
         ":retail_php_gapic",
-        ":retail_php_grpc",
         ":retail_php_proto",
     ],
 )

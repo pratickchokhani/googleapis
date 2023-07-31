@@ -29,6 +29,7 @@ proto_library(
         "//google/api:client_proto",
         "//google/api:field_behavior_proto",
         "//google/iam/v1:policy_proto",
+        "//google/rpc:status_proto",
         "//google/type:expr_proto",
     ],
 )
@@ -67,16 +68,18 @@ java_grpc_library(
 java_gapic_library(
     name = "policytroubleshooter_java_gapic",
     srcs = [":policytroubleshooter_proto_with_info"],
+    gapic_yaml = None,
     grpc_service_config = "checker_grpc_service_config.json",
     rest_numeric_enums = True,
     service_yaml = "policytroubleshooter_v1.yaml",
     test_deps = [
-        ":policytroubleshooter_java_grpc",
         "//google/iam/v1:iam_java_grpc",
+        ":policytroubleshooter_java_grpc",
     ],
     transport = "grpc+rest",
     deps = [
         ":policytroubleshooter_java_proto",
+        "//google/api:api_java_proto",
         "//google/iam/v1:iam_java_proto",
     ],
 )
@@ -111,7 +114,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -122,6 +124,7 @@ go_proto_library(
     deps = [
         "//google/api:annotations_go_proto",
         "//google/iam/v1:iam_go_proto",
+        "//google/rpc:status_go_proto",
         "//google/type:expr_go_proto",
     ],
 )
@@ -142,18 +145,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "policytroubleshooter_go_gapic_test",
-    srcs = [":policytroubleshooter_go_gapic_srcjar_test"],
-    embed = [":policytroubleshooter_go_gapic"],
-    importpath = "cloud.google.com/go/policytroubleshooter/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-policytroubleshooter-v1-go",
     deps = [
         ":policytroubleshooter_go_gapic",
+        ":policytroubleshooter_go_gapic_srcjar-metadata.srcjar",
+        ":policytroubleshooter_go_gapic_srcjar-snippets.srcjar",
         ":policytroubleshooter_go_gapic_srcjar-test.srcjar",
         ":policytroubleshooter_go_proto",
     ],
@@ -207,7 +205,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -216,21 +213,15 @@ php_proto_library(
     deps = [":policytroubleshooter_proto"],
 )
 
-php_grpc_library(
-    name = "policytroubleshooter_php_grpc",
-    srcs = [":policytroubleshooter_proto"],
-    deps = [":policytroubleshooter_php_proto"],
-)
-
 php_gapic_library(
     name = "policytroubleshooter_php_gapic",
     srcs = [":policytroubleshooter_proto_with_info"],
     grpc_service_config = "checker_grpc_service_config.json",
+    migration_mode = "MIGRATION_MODE_UNSPECIFIED",
     rest_numeric_enums = True,
     service_yaml = "policytroubleshooter_v1.yaml",
     transport = "grpc+rest",
     deps = [
-        ":policytroubleshooter_php_grpc",
         ":policytroubleshooter_php_proto",
     ],
 )
@@ -240,7 +231,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-policytroubleshooter-v1-php",
     deps = [
         ":policytroubleshooter_php_gapic",
-        ":policytroubleshooter_php_grpc",
         ":policytroubleshooter_php_proto",
     ],
 )
@@ -342,6 +332,7 @@ load(
 
 csharp_proto_library(
     name = "policytroubleshooter_csharp_proto",
+    extra_opts = [],
     deps = [":policytroubleshooter_proto"],
 )
 

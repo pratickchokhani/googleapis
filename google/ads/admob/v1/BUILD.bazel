@@ -110,7 +110,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -137,18 +136,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "admob_go_gapic_test",
-    srcs = [":admob_go_gapic_srcjar_test"],
-    embed = [":admob_go_gapic"],
-    importpath = "google.golang.org/google/ads/admob/v1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-ads-admob-v1-go",
     deps = [
         ":admob_go_gapic",
+        ":admob_go_gapic_srcjar-snippets.srcjar",
         ":admob_go_gapic_srcjar-test.srcjar",
         ":admob_go_proto",
     ],

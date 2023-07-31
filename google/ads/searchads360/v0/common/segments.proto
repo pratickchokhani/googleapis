@@ -1,4 +1,4 @@
-// Copyright 2022 Google LLC
+// Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package google.ads.searchads360.v0.common;
 
+import "google/ads/searchads360/v0/common/criteria.proto";
 import "google/ads/searchads360/v0/enums/conversion_action_category.proto";
 import "google/ads/searchads360/v0/enums/day_of_week.proto";
 import "google/ads/searchads360/v0/enums/device.proto";
@@ -36,11 +37,12 @@ option ruby_package = "Google::Ads::SearchAds360::V0::Common";
 message Segments {
   // Resource name of the conversion action.
   optional string conversion_action = 146 [(google.api.resource_reference) = {
-                                             type: "searchads360.googleapis.com/ConversionAction"
-                                           }];
+    type: "searchads360.googleapis.com/ConversionAction"
+  }];
 
   // Conversion action category.
-  google.ads.searchads360.v0.enums.ConversionActionCategoryEnum.ConversionActionCategory conversion_action_category = 53;
+  google.ads.searchads360.v0.enums.ConversionActionCategoryEnum
+      .ConversionActionCategory conversion_action_category = 53;
 
   // Conversion action name.
   optional string conversion_action_name = 114;
@@ -54,6 +56,9 @@ message Segments {
 
   // Device to which metrics apply.
   google.ads.searchads360.v0.enums.DeviceEnum.Device device = 1;
+
+  // Keyword criterion.
+  Keyword keyword = 61;
 
   // Month as represented by the date of the first day of a month. Formatted as
   // yyyy-MM-dd.
@@ -70,4 +75,13 @@ message Segments {
 
   // Year, formatted as yyyy.
   optional int32 year = 131;
+}
+
+// A Keyword criterion segment.
+message Keyword {
+  // The AdGroupCriterion resource name.
+  optional string ad_group_criterion = 3;
+
+  // Keyword info.
+  KeywordInfo info = 2;
 }

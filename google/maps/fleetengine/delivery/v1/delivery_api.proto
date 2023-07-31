@@ -28,7 +28,7 @@ import "google/maps/fleetengine/delivery/v1/task_tracking_info.proto";
 import "google/maps/fleetengine/delivery/v1/tasks.proto";
 import "google/protobuf/field_mask.proto";
 
-option go_package = "google.golang.org/genproto/googleapis/maps/fleetengine/delivery/v1;delivery";
+option go_package = "cloud.google.com/go/maps/fleetengine/delivery/apiv1/deliverypb;deliverypb";
 option java_multiple_files = true;
 option java_outer_classname = "DeliveryApi";
 option java_package = "google.maps.fleetengine.delivery.v1";
@@ -41,6 +41,8 @@ option (google.api.resource_definition) = {
 // The Last Mile Delivery service.
 service DeliveryService {
   option (google.api.default_host) = "fleetengine.googleapis.com";
+  option (google.api.oauth_scopes) =
+      "https://www.googleapis.com/auth/cloud-platform";
 
   // Creates and returns a new `DeliveryVehicle`.
   rpc CreateDeliveryVehicle(CreateDeliveryVehicleRequest)
@@ -245,7 +247,6 @@ message CreateDeliveryVehicleRequest {
 }
 
 // The `GetDeliveryVehicle` request message.
-// Next id: 4
 message GetDeliveryVehicleRequest {
   // Optional. The standard Delivery API request header.
   DeliveryRequestHeader header = 1 [(google.api.field_behavior) = OPTIONAL];

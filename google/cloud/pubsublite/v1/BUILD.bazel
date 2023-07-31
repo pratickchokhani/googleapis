@@ -124,7 +124,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -158,18 +157,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "pubsublite_go_gapic_test",
-    srcs = [":pubsublite_go_gapic_srcjar_test"],
-    embed = [":pubsublite_go_gapic"],
-    importpath = "cloud.google.com/go/pubsublite/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-pubsublite-v1-go",
     deps = [
         ":pubsublite_go_gapic",
+        ":pubsublite_go_gapic_srcjar-snippets.srcjar",
         ":pubsublite_go_gapic_srcjar-test.srcjar",
         ":pubsublite_go_proto",
     ],

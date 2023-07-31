@@ -15,7 +15,9 @@ apis:
 - name: google.cloud.aiplatform.v1beta1.MatchService
 - name: google.cloud.aiplatform.v1beta1.MetadataService
 - name: google.cloud.aiplatform.v1beta1.MigrationService
+- name: google.cloud.aiplatform.v1beta1.ModelGardenService
 - name: google.cloud.aiplatform.v1beta1.ModelService
+- name: google.cloud.aiplatform.v1beta1.PersistentResourceService
 - name: google.cloud.aiplatform.v1beta1.PipelineService
 - name: google.cloud.aiplatform.v1beta1.PredictionService
 - name: google.cloud.aiplatform.v1beta1.ScheduleService
@@ -46,6 +48,7 @@ types:
 - name: google.cloud.aiplatform.v1beta1.CreateIndexEndpointOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.CreateIndexOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.CreateMetadataStoreOperationMetadata
+- name: google.cloud.aiplatform.v1beta1.CreatePersistentResourceOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.CreateSpecialistPoolOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.CreateTensorboardOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.DeleteFeatureValuesOperationMetadata
@@ -68,6 +71,8 @@ types:
 - name: google.cloud.aiplatform.v1beta1.ImportFeatureValuesResponse
 - name: google.cloud.aiplatform.v1beta1.MutateDeployedIndexOperationMetadata
 - name: google.cloud.aiplatform.v1beta1.MutateDeployedIndexResponse
+- name: google.cloud.aiplatform.v1beta1.MutateDeployedModelOperationMetadata
+- name: google.cloud.aiplatform.v1beta1.MutateDeployedModelResponse
 - name: google.cloud.aiplatform.v1beta1.PurgeArtifactsMetadata
 - name: google.cloud.aiplatform.v1beta1.PurgeArtifactsResponse
 - name: google.cloud.aiplatform.v1beta1.PurgeContextsMetadata
@@ -129,11 +134,6 @@ documentation:
       permission-aware UIs and command-line tools, not for authorization
       checking. This operation may "fail open" without warning.
 
-  - selector: google.longrunning.Operations.ListOperations
-    description: |-
-      Lists operations that match the specified filter in the request. If
-      the server doesn't support this method, it returns `UNIMPLEMENTED`.
-
 backend:
   rules:
   - selector: 'google.cloud.aiplatform.v1beta1.DatasetService.*'
@@ -162,8 +162,12 @@ backend:
     deadline: 60.0
   - selector: google.cloud.aiplatform.v1beta1.MigrationService.SearchMigratableResources
     deadline: 60.0
+  - selector: google.cloud.aiplatform.v1beta1.ModelGardenService.GetPublisherModel
+    deadline: 60.0
   - selector: 'google.cloud.aiplatform.v1beta1.ModelService.*'
     deadline: 60.0
+  - selector: 'google.cloud.aiplatform.v1beta1.PersistentResourceService.*'
+    deadline: 30.0
   - selector: 'google.cloud.aiplatform.v1beta1.PipelineService.*'
     deadline: 60.0
   - selector: 'google.cloud.aiplatform.v1beta1.PredictionService.*'
@@ -201,9 +205,13 @@ http:
     additional_bindings:
     - post: '/v1beta1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
     - post: '/v1beta1/{resource=projects/*/locations/*/models/*}:getIamPolicy'
+    - post: '/v1beta1/{resource=projects/*/locations/*/endpoints/*}:getIamPolicy'
+    - post: '/v1beta1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:getIamPolicy'
     - post: '/ui/{resource=projects/*/locations/*/models/*}:getIamPolicy'
+    - post: '/ui/{resource=projects/*/locations/*/endpoints/*}:getIamPolicy'
+    - post: '/ui/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:getIamPolicy'
   - selector: google.iam.v1.IAMPolicy.SetIamPolicy
     post: '/v1beta1/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
     body: '*'
@@ -212,11 +220,19 @@ http:
       body: '*'
     - post: '/v1beta1/{resource=projects/*/locations/*/models/*}:setIamPolicy'
       body: '*'
+    - post: '/v1beta1/{resource=projects/*/locations/*/endpoints/*}:setIamPolicy'
+      body: '*'
+    - post: '/v1beta1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:setIamPolicy'
+      body: '*'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:setIamPolicy'
       body: '*'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:setIamPolicy'
       body: '*'
     - post: '/ui/{resource=projects/*/locations/*/models/*}:setIamPolicy'
+      body: '*'
+    - post: '/ui/{resource=projects/*/locations/*/endpoints/*}:setIamPolicy'
+      body: '*'
+    - post: '/ui/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:setIamPolicy'
       body: '*'
   - selector: google.iam.v1.IAMPolicy.TestIamPermissions
     post: '/v1beta1/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
@@ -224,9 +240,13 @@ http:
     additional_bindings:
     - post: '/v1beta1/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
     - post: '/v1beta1/{resource=projects/*/locations/*/models/*}:testIamPermissions'
+    - post: '/v1beta1/{resource=projects/*/locations/*/endpoints/*}:testIamPermissions'
+    - post: '/v1beta1/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/featurestores/*/entityTypes/*}:testIamPermissions'
     - post: '/ui/{resource=projects/*/locations/*/models/*}:testIamPermissions'
+    - post: '/ui/{resource=projects/*/locations/*/endpoints/*}:testIamPermissions'
+    - post: '/ui/{resource=projects/*/locations/*/notebookRuntimeTemplates/*}:testIamPermissions'
   - selector: google.longrunning.Operations.CancelOperation
     post: '/ui/{name=projects/*/locations/*/operations/*}:cancel'
     additional_bindings:
@@ -351,6 +371,7 @@ http:
     - delete: '/v1beta1/{name=projects/*/locations/*/models/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/models/*/evaluations/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/persistentResources/*/operations/*}'
+    - delete: '/v1beta1/{name=projects/*/locations/*/solvers/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/studies/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/studies/*/trials/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/trainingPipelines/*/operations/*}'
@@ -361,6 +382,8 @@ http:
     - delete: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/operations/*}'
     - delete: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*/operations/*}'
+    - delete: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/operations/*}'
+    - delete: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/featureViews/*/operations/*}'
   - selector: google.longrunning.Operations.GetOperation
     get: '/ui/{name=projects/*/locations/*/operations/*}'
     additional_bindings:
@@ -419,6 +442,7 @@ http:
     - get: '/v1beta1/{name=projects/*/locations/*/models/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/models/*/evaluations/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/persistentResources/*/operations/*}'
+    - get: '/v1beta1/{name=projects/*/locations/*/solvers/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/studies/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/studies/*/trials/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/trainingPipelines/*/operations/*}'
@@ -429,6 +453,8 @@ http:
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/operations/*}'
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*/operations/*}'
+    - get: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/operations/*}'
+    - get: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/featureViews/*/operations/*}'
   - selector: google.longrunning.Operations.ListOperations
     get: '/ui/{name=projects/*/locations/*}/operations'
     additional_bindings:
@@ -486,6 +512,7 @@ http:
     - get: '/v1beta1/{name=projects/*/locations/*/models/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/models/*/evaluations/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/persistentResources/*}/operations'
+    - get: '/v1beta1/{name=projects/*/locations/*/solvers/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/studies/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/studies/*/trials/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/trainingPipelines/*}/operations'
@@ -496,6 +523,8 @@ http:
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*}/operations'
     - get: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*}/operations'
+    - get: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*}/operations'
+    - get: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/featureViews/*}/operations'
   - selector: google.longrunning.Operations.WaitOperation
     post: '/ui/{name=projects/*/locations/*/operations/*}:wait'
     additional_bindings:
@@ -563,6 +592,8 @@ http:
     - post: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/operations/*}:wait'
     - post: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/operations/*}:wait'
     - post: '/v1beta1/{name=projects/*/locations/*/tensorboards/*/experiments/*/runs/*/timeSeries/*/operations/*}:wait'
+    - post: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/operations/*}:wait'
+    - post: '/v1beta1/{name=projects/*/locations/*/featureOnlineStores/*/featureViews/*/operations/*}:wait'
 
 authentication:
   rules:
@@ -623,7 +654,15 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+  - selector: google.cloud.aiplatform.v1beta1.ModelGardenService.GetPublisherModel
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
   - selector: 'google.cloud.aiplatform.v1beta1.ModelService.*'
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/cloud-platform
+  - selector: 'google.cloud.aiplatform.v1beta1.PersistentResourceService.*'
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
@@ -667,3 +706,21 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/cloud-platform
+
+publishing:
+  documentation_uri: https://cloud.google.com/ai-platform/docs
+  github_label: 'api: aiplatform'
+  organization: CLOUD
+  library_settings:
+  - version: google.cloud.aiplatform.v1
+    dotnet_settings:
+      renamed_resources:
+        datalabeling.googleapis.com/Dataset: DataLabelingDataset
+        automl.googleapis.com/Dataset: AutoMLDataset
+        automl.googleapis.com/Model: AutoMLModel
+  - version: google.cloud.aiplatform.v1beta1
+    dotnet_settings:
+      renamed_resources:
+        datalabeling.googleapis.com/Dataset: DataLabelingDataset
+        automl.googleapis.com/Dataset: AutoMLDataset
+        automl.googleapis.com/Model: AutoMLModel

@@ -17,6 +17,8 @@ load(
     "java_gapic_assembly_gradle_pkg",
     "java_grpc_library",
     "java_proto_library",
+    "php_gapic_assembly_pkg",
+    "php_proto_library",
     "proto_library_with_info",
     "py_proto_library",
     "ruby_cloud_gapic_library",
@@ -117,8 +119,8 @@ go_gapic_library(
     srcs = [":iam_proto_with_info"],
     grpc_service_config = None,
     importpath = "cloud.google.com/go/iam/apiv1;iam",
-    release_level = "ga",
     metadata = True,
+    release_level = "ga",
     rest_numeric_enums = True,
     service_yaml = "iam_meta_api.yaml",
     transport = "grpc+rest",
@@ -129,8 +131,9 @@ go_gapic_assembly_pkg(
     name = "gapi-cloud-iam-v1-go",
     deps = [
         ":iam_go_gapic",
-        ":iam_go_gapic_srcjar-test.srcjar",
         ":iam_go_gapic_srcjar-metadata.srcjar",
+        ":iam_go_gapic_srcjar-snippets.srcjar",
+        ":iam_go_gapic_srcjar-test.srcjar",
         ":iam_go_proto",
     ],
 )
@@ -170,6 +173,21 @@ py_proto_library(
 py_proto_library(
     name = "options_py_proto",
     deps = [":options_proto"],
+)
+
+php_proto_library(
+    name = "iam_php_proto",
+    deps = [
+        ":iam_policy_proto",
+        ":options_proto",
+        ":policy_proto",
+    ],
+)
+
+# Open Source Packages
+php_gapic_assembly_pkg(
+    name = "google-iam-v1-php",
+    deps = [":iam_php_proto"],
 )
 
 ruby_proto_library(

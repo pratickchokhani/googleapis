@@ -75,15 +75,19 @@ proto_library(
         "model_deployment_monitoring_job.proto",
         "model_evaluation.proto",
         "model_evaluation_slice.proto",
+        "model_garden_service.proto",
         "model_monitoring.proto",
         "model_service.proto",
         "nas_job.proto",
         "operation.proto",
+        "persistent_resource.proto",
+        "persistent_resource_service.proto",
         "pipeline_failure_policy.proto",
         "pipeline_job.proto",
         "pipeline_service.proto",
         "pipeline_state.proto",
         "prediction_service.proto",
+        "publisher_model.proto",
         "saved_query.proto",
         "schedule.proto",
         "schedule_service.proto",
@@ -216,6 +220,7 @@ java_gapic_test(
 # Open Source Packages
 java_gapic_assembly_gradle_pkg(
     name = "google-cloud-aiplatform-v1beta1-java",
+    include_samples = True,
     transport = "grpc",
     deps = [
         ":aiplatform_java_gapic",
@@ -233,7 +238,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -274,19 +278,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "aiplatform_go_gapic_test",
-    srcs = [":aiplatform_go_gapic_srcjar_test"],
-    embed = [":aiplatform_go_gapic"],
-    importpath = "cloud.google.com/go/aiplatform/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-aiplatform-v1beta1-go",
     deps = [
         ":aiplatform_go_gapic",
         ":aiplatform_go_gapic_srcjar-metadata.srcjar",
+        ":aiplatform_go_gapic_srcjar-snippets.srcjar",
         ":aiplatform_go_gapic_srcjar-test.srcjar",
         ":aiplatform_go_proto",
     ],
@@ -346,19 +344,12 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
 php_proto_library(
     name = "aiplatform_php_proto",
     deps = [":aiplatform_proto"],
-)
-
-php_grpc_library(
-    name = "aiplatform_php_grpc",
-    srcs = [":aiplatform_proto"],
-    deps = [":aiplatform_php_proto"],
 )
 
 php_gapic_library(
@@ -368,10 +359,7 @@ php_gapic_library(
     rest_numeric_enums = False,
     service_yaml = "aiplatform_v1beta1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":aiplatform_php_grpc",
-        ":aiplatform_php_proto",
-    ],
+    deps = [":aiplatform_php_proto"],
 )
 
 # Open Source Packages
@@ -379,7 +367,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-aiplatform-v1beta1-php",
     deps = [
         ":aiplatform_php_gapic",
-        ":aiplatform_php_grpc",
         ":aiplatform_php_proto",
     ],
 )
@@ -481,32 +468,28 @@ csharp_grpc_library(
     deps = [":aiplatform_csharp_proto"],
 )
 
-################################
-# Keep C# targets commented out through the regeneration, as C# gen has an issue
-# with the aiplatform v1beta1 protos
-#
-# csharp_gapic_library(
-#     name = "aiplatform_csharp_gapic",
-#     srcs = [":aiplatform_proto_with_info"],
-#     common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
-#     grpc_service_config = "aiplatform_grpc_service_config.json",
-#     service_yaml = "aiplatform_v1beta1.yaml",
-#     deps = [
-#         ":aiplatform_csharp_grpc",
-#         ":aiplatform_csharp_proto",
-#     ],
-# )
+csharp_gapic_library(
+    name = "aiplatform_csharp_gapic",
+    srcs = [":aiplatform_proto_with_info"],
+    common_resources_config = "@gax_dotnet//:Google.Api.Gax/ResourceNames/CommonResourcesConfig.json",
+    grpc_service_config = "aiplatform_grpc_service_config.json",
+    rest_numeric_enums = False,
+    service_yaml = "aiplatform_v1beta1.yaml",
+    deps = [
+        ":aiplatform_csharp_grpc",
+        ":aiplatform_csharp_proto",
+    ],
+)
 
 # Open Source Packages
-# csharp_gapic_assembly_pkg(
-#     name = "google-cloud-aiplatform-v1beta1-csharp",
-#     deps = [
-#         ":aiplatform_csharp_gapic",
-#         ":aiplatform_csharp_grpc",
-#         ":aiplatform_csharp_proto",
-#     ],
-# )
-################################
+csharp_gapic_assembly_pkg(
+    name = "google-cloud-aiplatform-v1beta1-csharp",
+    deps = [
+        ":aiplatform_csharp_gapic",
+        ":aiplatform_csharp_grpc",
+        ":aiplatform_csharp_proto",
+    ],
+)
 
 ##############################################################################
 # C++

@@ -24,6 +24,7 @@ proto_library(
         "channel_partner_links.proto",
         "common.proto",
         "customers.proto",
+        "entitlement_changes.proto",
         "entitlements.proto",
         "offers.proto",
         "operations.proto",
@@ -32,7 +33,6 @@ proto_library(
         "repricing.proto",
         "service.proto",
         "subscriber_event.proto",
-        "entitlement_changes.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -130,7 +130,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -168,19 +167,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "channel_go_gapic_test",
-    srcs = [":channel_go_gapic_srcjar_test"],
-    embed = [":channel_go_gapic"],
-    importpath = "cloud.google.com/go/channel/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-channel-v1-go",
     deps = [
         ":channel_go_gapic",
         ":channel_go_gapic_srcjar-metadata.srcjar",
+        ":channel_go_gapic_srcjar-snippets.srcjar",
         ":channel_go_gapic_srcjar-test.srcjar",
         ":channel_go_proto",
     ],
@@ -230,7 +223,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -239,23 +231,15 @@ php_proto_library(
     deps = [":channel_proto"],
 )
 
-php_grpc_library(
-    name = "channel_php_grpc",
-    srcs = [":channel_proto"],
-    deps = [":channel_php_proto"],
-)
-
 php_gapic_library(
     name = "channel_php_gapic",
     srcs = [":channel_proto_with_info"],
     grpc_service_config = "cloudchannel_grpc_service_config.json",
+    migration_mode = "MIGRATION_MODE_UNSPECIFIED",
     rest_numeric_enums = True,
     service_yaml = "cloudchannel_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":channel_php_grpc",
-        ":channel_php_proto",
-    ],
+    deps = [":channel_php_proto"],
 )
 
 # Open Source Packages
@@ -263,7 +247,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-channel-v1-php",
     deps = [
         ":channel_php_gapic",
-        ":channel_php_grpc",
         ":channel_php_proto",
     ],
 )

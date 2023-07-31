@@ -9,7 +9,7 @@ jobs:
   regenerate-compute:
     if: github.repository == 'googleapis/googleapis'
     runs-on: ubuntu-latest
-    container: gcr.io/gapic-images/googleapis:20230301
+    container: gcr.io/gapic-images/googleapis:20230531
     steps:
     - name: Checkout master
       uses: actions/checkout@v3
@@ -21,6 +21,7 @@ jobs:
         echo compute_revision=$(grep -oP '"revision":\s*"\d+"' google/cloud/compute/v1/compute.v1.json | grep -oP '\d+') >> $GITHUB_ENV
     - name: Regenerate API definitions
       run: |
+        git config --global --add safe.directory /__w/googleapis/googleapis
         bazel build //google/cloud/compute/v1:compute_gen
         cp bazel-bin/google/cloud/compute/v1/compute_gen.proto google/cloud/compute/v1/compute.proto
         bazel build //google/cloud/compute/v1:compute_grpc_service_config_gen

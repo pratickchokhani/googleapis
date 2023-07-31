@@ -6,6 +6,16 @@ title: Google Analytics Admin API
 apis:
 - name: google.analytics.admin.v1alpha.AnalyticsAdminService
 
+documentation:
+  summary: |-
+    Manage properties in Google Analytics.  Warning: Creating multiple Customer
+    Applications, Accounts, or Projects to simulate or act as a single
+    Customer Application, Account, or Project (respectively) or to circumvent
+    Service-specific usage limits or quotas is a direct violation of Google
+    Cloud Platform Terms of Service as well as Google APIs Terms of Service.
+    These actions can result in immediate termination of your GCP project(s)
+    without any warning.
+
 authentication:
   rules:
   - selector: 'google.analytics.admin.v1alpha.AnalyticsAdminService.*'
@@ -72,6 +82,11 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.FetchConnectedGa4Property
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetAccessBinding
     oauth:
       canonical_scopes: |-
@@ -93,6 +108,11 @@ authentication:
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetBigQueryLink
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetChannelGroup
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
@@ -138,6 +158,11 @@ authentication:
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetEnhancedMeasurementSettings
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.GetEventCreateRule
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
@@ -202,6 +227,11 @@ authentication:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListChannelGroups
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListConnectedSiteTags
     oauth:
       canonical_scopes: |-
@@ -233,6 +263,11 @@ authentication:
         https://www.googleapis.com/auth/analytics.edit,
         https://www.googleapis.com/auth/analytics.readonly
   - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListDisplayVideo360AdvertiserLinks
+    oauth:
+      canonical_scopes: |-
+        https://www.googleapis.com/auth/analytics.edit,
+        https://www.googleapis.com/auth/analytics.readonly
+  - selector: google.analytics.admin.v1alpha.AnalyticsAdminService.ListEventCreateRules
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.edit,
@@ -285,13 +320,3 @@ authentication:
     oauth:
       canonical_scopes: |-
         https://www.googleapis.com/auth/analytics.manage.users
-
-publishing:
-  organization: CLIENT_LIBRARY_ORGANIZATION_UNSPECIFIED
-  new_issue_uri: ''
-  documentation_uri: ''
-  api_short_name: ''
-  github_label: ''
-  doc_tag_prefix: ''
-  codeowner_github_teams:
-  library_settings:

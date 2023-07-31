@@ -113,7 +113,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -145,19 +144,13 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "workflows_go_gapic_test",
-    srcs = [":workflows_go_gapic_srcjar_test"],
-    embed = [":workflows_go_gapic"],
-    importpath = "cloud.google.com/go/workflows/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-workflows-v1-go",
     deps = [
         ":workflows_go_gapic",
         ":workflows_go_gapic_srcjar-metadata.srcjar",
+        ":workflows_go_gapic_srcjar-snippets.srcjar",
         ":workflows_go_gapic_srcjar-test.srcjar",
         ":workflows_go_proto",
     ],
@@ -207,7 +200,6 @@ load(
     "@com_google_googleapis_imports//:imports.bzl",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
 )
 
@@ -216,23 +208,15 @@ php_proto_library(
     deps = [":workflows_proto"],
 )
 
-php_grpc_library(
-    name = "workflows_php_grpc",
-    srcs = [":workflows_proto"],
-    deps = [":workflows_php_proto"],
-)
-
 php_gapic_library(
     name = "workflows_php_gapic",
     srcs = [":workflows_proto_with_info"],
     grpc_service_config = "workflows_grpc_service_config.json",
+    migration_mode = "NEW_SURFACE_ONLY",
     rest_numeric_enums = True,
     service_yaml = "workflows_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":workflows_php_grpc",
-        ":workflows_php_proto",
-    ],
+    deps = [":workflows_php_proto"],
 )
 
 # Open Source Packages
@@ -240,7 +224,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-workflows-v1-php",
     deps = [
         ":workflows_php_gapic",
-        ":workflows_php_grpc",
         ":workflows_php_proto",
     ],
 )

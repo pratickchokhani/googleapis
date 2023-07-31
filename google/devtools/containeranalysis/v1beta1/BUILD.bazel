@@ -43,8 +43,8 @@ proto_library(
 proto_library_with_info(
     name = "containeranalysis_proto_with_info",
     deps = [
-        "//google/cloud:common_resources_proto",
         ":containeranalysis_proto",
+        "//google/cloud:common_resources_proto",
     ] + _PROTO_SUBPACKAGE_DEPS,
 )
 
@@ -147,7 +147,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
 )
 
 go_proto_library(
@@ -187,18 +186,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "containeranalysis_go_gapic_test",
-    srcs = [":containeranalysis_go_gapic_srcjar_test"],
-    embed = [":containeranalysis_go_gapic"],
-    importpath = "cloud.google.com/go/containeranalysis/apiv1beta1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-devtools-containeranalysis-v1beta1-go",
     deps = [
         ":containeranalysis_go_gapic",
+        ":containeranalysis_go_gapic_srcjar-snippets.srcjar",
         ":containeranalysis_go_gapic_srcjar-test.srcjar",
         ":containeranalysis_go_proto",
         "//google/devtools/containeranalysis/v1beta1/attestation:attestation_go_proto",

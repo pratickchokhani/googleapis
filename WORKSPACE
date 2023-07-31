@@ -77,16 +77,94 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
+# This must be above the download of gRPC (in C++ section) and 
+# rules_gapic_repositories because both depend on rules_go and we need to manage
+# our version of rules_go explicitly rather than depend on the version those
+# bring in transitively.
+_io_bazel_rules_go_version = "0.34.0"
+
 http_archive(
-    name = "com_google_protobuf",
-    sha256 = "930c2c3b5ecc6c9c12615cf5ad93f1cd6e12d0aba862b572e076259970ac3a53",
-    strip_prefix = "protobuf-3.21.12",
-    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.21.12.tar.gz"],
+    name = "io_bazel_rules_go",
+    sha256 = "16e9fca53ed6bd4ff4ad76facc9b7b651a89db1689a2877d6fd7b82aa824e366",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v{0}/rules_go-v{0}.zip".format(_io_bazel_rules_go_version),
+        "https://github.com/bazelbuild/rules_go/releases/download/v{0}/rules_go-v{0}.zip".format(_io_bazel_rules_go_version),
+    ],
 )
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+##############################################################################
+# C++
+##############################################################################
+# C++ must go before everything else, since the key dependencies (protobuf and gRPC)
+# are C++ repositories and they have the highest chance to have the correct versions of the
+# transitive dependencies (for those dependencies which are shared by many other repositories
+# imported in this workspace).
+#
+# This comes before Protobuf's section, meaning we prioritize gRPC's dependencies
+# (including upb and absl) over Protobuf's. Because the gRPC team prioritizes their
+# own dependencies when they test gRPC and Protobuf compatibility, gRPC's dependencies have
+# better chance to make it work.
+#
+# Note, even though protobuf and gRPC are mostly written in C++, they are used to generate stuff
+# for most of the other languages as well, so they can be considered as the core cross-language
+# dependencies.
 
+# Import boringssl explicitly to override what gRPC imports as its dependency.
+# Boringssl build fails on gcc12 without this fix:
+# https://github.com/google/boringssl/commit/8462a367bb57e9524c3d8eca9c62733c63a63cf4,
+# which is present only in the newest version of boringssl, not the one imported
+# by gRPC. Remove this import once gRPC depends on a newer version.
+http_archive(
+    name = "boringssl",
+    sha256 = "b460f8673f3393e58ce506e9cdde7f2c3b2575b075f214cb819fb57d809f052b",
+    strip_prefix = "boringssl-bb41bc007079982da419c0ec3186e510cbcf09d0",
+    urls = [
+        "https://github.com/google/boringssl/archive/bb41bc007079982da419c0ec3186e510cbcf09d0.zip",
+    ],
+)
+
+_grpc_version = "1.55.1"
+
+_grpc_sha256 = "17c0685da231917a7b3be2671a7b13b550a85fdda5e475313264c5f51c4da3f8"
+
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = _grpc_sha256,
+    strip_prefix = "grpc-%s" % _grpc_version,
+    urls = ["https://github.com/grpc/grpc/archive/v%s.zip" % _grpc_version],
+)
+
+# Explicitly declaring Protobuf version, while Protobuf dependency is already
+# instantiated in grpc_deps().
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "0b0395d34e000f1229679e10d984ed7913078f3dd7f26cf0476467f5e65716f4",
+    strip_prefix = "protobuf-23.2",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v23.2.tar.gz"],
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps", "PROTOBUF_MAVEN_ARTIFACTS")
+# This is actually already done within grpc_deps but calling this for Bazel convention.
 protobuf_deps()
+
+# gRPC enforces a specific version of Go toolchain which conflicts with our build.
+# All the relevant parts of grpc_extra_deps() are imported in this  WORKSPACE file
+# explicitly, that is why we do not call grpc_extra_deps() here and call
+# apple_rules_dependencies and apple_support_dependencies macros explicitly.
+
+load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
+
+apple_rules_dependencies()
+
+load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
+
+apple_support_dependencies()
+
+# End of C++ section
 
 http_archive(
     name = "rules_proto",
@@ -111,30 +189,15 @@ rules_proto_toolchains()
 # rules_gapic also depends on rules_go, so it must come after our own dependency on rules_go.
 # It must also come before gapic-generator-go so as to ensure that it does not bring in an old
 # version of rules_gapic.
-_rules_gapic_version = "0.23.1"
+_rules_gapic_version = "0.28.1"
 
-_rules_gapic_sha256 = "cda71a5e50daa31bdf7c1bbc9196cea21adb3daea97e2a28dc9569f03c2a4f52"
+_rules_gapic_sha256 = "913d88485702c6605ff481678a63cfd710877252a74ff9181bf0452515039625"
 
 http_archive(
     name = "rules_gapic",
     sha256 = _rules_gapic_sha256,
     strip_prefix = "rules_gapic-%s" % _rules_gapic_version,
     urls = ["https://github.com/googleapis/rules_gapic/archive/v%s.tar.gz" % _rules_gapic_version],
-)
-
-# This must be above the download of gRPC (in C++ section) and 
-# rules_gapic_repositories because both depend on rules_go and we need to manage
-# our version of rules_go explicitly rather than depend on the version those
-# bring in transitively.
-_io_bazel_rules_go_version = "0.34.0"
-
-http_archive(
-    name = "io_bazel_rules_go",
-    sha256 = "16e9fca53ed6bd4ff4ad76facc9b7b651a89db1689a2877d6fd7b82aa824e366",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v{0}/rules_go-v{0}.zip".format(_io_bazel_rules_go_version),
-        "https://github.com/bazelbuild/rules_go/releases/download/v{0}/rules_go-v{0}.zip".format(_io_bazel_rules_go_version),
-    ],
 )
 
 # Gazelle dependency version should match gazelle dependency expected by gRPC
@@ -159,11 +222,7 @@ local_repository(
     path = ".",
 )
 
-# Until this project is migrated to consume the new subdirectory of generated
-# types e.g. longrunningpb, we must define our own version of longrunning here.
-load("@bazel_gazelle//:deps.bzl", "go_repository")
-
-_gapic_generator_go_version = "0.35.2"
+_gapic_generator_go_version = "0.37.2"
 
 http_archive(
     name = "com_googleapis_gapic_generator_go",
@@ -193,62 +252,8 @@ load("@rules_gapic//:repositories.bzl", "rules_gapic_repositories")
 rules_gapic_repositories()
 
 ##############################################################################
-# C++
-##############################################################################
-# C++ must go before everything else, since the key dependencies (protobuf and gRPC)
-# are C++ repositories and they have the highest chance to have the correct versions of the
-# transitive dependencies (for those dependencies which are shared by many other repositories
-# imported in this workspace).
-#
-# Note, even though protobuf and gRPC are mostly written in C++, they are used to generate stuff
-# for most of the other languages as well, so they can be considered as the core cross-language
-# dependencies.
-
-# Import boringssl explicitly to override what gRPC imports as its dependency.
-# Boringssl build fails on gcc12 without this fix:
-# https://github.com/google/boringssl/commit/8462a367bb57e9524c3d8eca9c62733c63a63cf4,
-# which is present only in the newest version of boringssl, not the one imported
-# by gRPC. Remove this import once gRPC depends on a newer version.
-http_archive(
-    name = "boringssl",
-    sha256 = "b460f8673f3393e58ce506e9cdde7f2c3b2575b075f214cb819fb57d809f052b",
-    strip_prefix = "boringssl-bb41bc007079982da419c0ec3186e510cbcf09d0",
-    urls = [
-        "https://github.com/google/boringssl/archive/bb41bc007079982da419c0ec3186e510cbcf09d0.zip",
-    ],
-)
-
-_grpc_version = "1.47.0"
-
-_grpc_sha256 = "edf25f4db6c841853b7a29d61b0980b516dc31a1b6cdc399bcf24c1446a4a249"
-
-http_archive(
-    name = "com_github_grpc_grpc",
-    sha256 = _grpc_sha256,
-    strip_prefix = "grpc-%s" % _grpc_version,
-    urls = ["https://github.com/grpc/grpc/archive/v%s.zip" % _grpc_version],
-)
-
-load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-
-grpc_deps()
-
-# gRPC enforces a specific version of Go toolchain which conflicts with our build.
-# All the relevant parts of grpc_extra_deps() are imported in this  WORKSPACE file
-# explicitly, that is why we do not call grpc_extra_deps() here.
-
-load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
-
-apple_rules_dependencies()
-
-load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
-
-apple_support_dependencies()
-
-##############################################################################
 # Java
 ##############################################################################
-load("@com_google_protobuf//:protobuf_deps.bzl", "PROTOBUF_MAVEN_ARTIFACTS")
 
 # Starting in protobuf 3.19, protobuf project started to provide
 # PROTOBUF_MAVEN_ARTIFACTS variable so that Bazel users can resolve their
@@ -265,7 +270,7 @@ maven_install(
     ],
 )
 
-_gapic_generator_java_version = "2.16.0"
+_gapic_generator_java_version = "2.23.1"
 
 maven_install(
     artifacts = [
@@ -281,15 +286,15 @@ maven_install(
 
 http_archive(
     name = "gapic_generator_java",
-    strip_prefix = "gapic-generator-java-%s" % _gapic_generator_java_version,
-    urls = ["https://github.com/googleapis/gapic-generator-java/archive/v%s.zip" % _gapic_generator_java_version],
+    strip_prefix = "sdk-platform-java-%s" % _gapic_generator_java_version,
+    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version],
 )
 
-# gax-java is part of gapic-generator-java repository
+# gax-java is part of sdk-platform-java repository
 http_archive(
     name = "com_google_api_gax_java",
-    strip_prefix = "gapic-generator-java-%s/gax-java" % _gapic_generator_java_version,
-    urls = ["https://github.com/googleapis/gapic-generator-java/archive/v%s.zip" % _gapic_generator_java_version],
+    strip_prefix = "sdk-platform-java-%s/gax-java" % _gapic_generator_java_version,
+    urls = ["https://github.com/googleapis/sdk-platform-java/archive/v%s.zip" % _gapic_generator_java_version],
 )
 
 load("@com_google_api_gax_java//:repository_rules.bzl", "com_google_api_gax_java_properties")
@@ -318,7 +323,7 @@ load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install()
 
-_gapic_generator_python_version = "1.9.1"
+_gapic_generator_python_version = "1.11.4"
 
 http_archive(
     name = "gapic_generator_python",
@@ -340,9 +345,9 @@ gapic_generator_register_toolchains()
 # TypeScript
 ##############################################################################
 
-_gapic_generator_typescript_version = "3.0.3"
+_gapic_generator_typescript_version = "4.0.0"
 
-_gapic_generator_typescript_sha256 = "f79b4517873f69ea09621b511aade2e039bcfc37f19342a135bf45eaa6f60595"
+_gapic_generator_typescript_sha256 = "eb413468838f682eb4a7732f83f59a42a46810f572c0cb54390807763e96c3c4"
 
 ### TypeScript generator
 http_archive(
@@ -385,7 +390,7 @@ pnpm_repository(name = "pnpm")
 ##############################################################################
 
 # PHP micro-generator
-_gapic_generator_php_version = "1.6.7"
+_gapic_generator_php_version = "1.8.0"
 
 http_archive(
     name = "gapic_generator_php",
@@ -393,15 +398,7 @@ http_archive(
     urls = ["https://github.com/googleapis/gapic-generator-php/archive/v%s.zip" % _gapic_generator_php_version],
 )
 
-load("@rules_gapic//php:php_gapic_repositories.bzl", "php", "php_gapic_repositories")
-
-# TODO(ndietz): upgrade to PHP 8x
-php(
-    name = "php",
-    prebuilt_phps = ["@gapic_generator_php//rules_php_gapic:resources/php-7.4.15_linux_x86_64.tar.gz"],
-    strip_prefix = "php-7.4.15",
-    urls = ["https://www.php.net/distributions/php-7.4.15.tar.gz"],
-)
+load("@rules_gapic//php:php_gapic_repositories.bzl", "php_gapic_repositories")
 
 php_gapic_repositories()
 
@@ -426,9 +423,9 @@ http_archive(
     urls = ["https://github.com/googleapis/gax-dotnet/archive/refs/tags/%s.tar.gz" % _gax_dotnet_version],
 )
 
-_gapic_generator_csharp_version = "1.4.11"
+_gapic_generator_csharp_version = "1.4.20"
 
-_gapic_generator_csharp_sha256 = "40bb2ecf1e540df8f58bdca15c48e3da6fbdddc9c5786421b858222fb4e25202"
+_gapic_generator_csharp_sha256 = "44e44378a5ce42fafeb7de811845541baa3a696969f57384c602f5b9047419a0"
 
 http_archive(
     name = "gapic_generator_csharp",
@@ -445,9 +442,9 @@ gapic_generator_csharp_repositories()
 # Ruby
 ##############################################################################
 
-_gapic_generator_ruby_version = "v0.23.2"
+_gapic_generator_ruby_version = "v0.24.0"
 
-_gapic_generator_ruby_sha256 = "cbd06c4bf4b0d41e361003f6976af69840c8f392b6adf89dcf0af1eaee2a8a12"
+_gapic_generator_ruby_sha256 = "832ce2e58d1991521543ab16eb5fef12824e332985f9e3cd75c9af458cbee632"
 
 http_archive(
     name = "gapic_generator_ruby",
@@ -464,7 +461,7 @@ gapic_generator_ruby_repositories()
 # Discovery
 ##############################################################################
 
-_disco_to_proto3_converter_version = "c47a76dd3d591478dd1a902413636c06da1153b8"
+_disco_to_proto3_converter_version = "96e1e63d3c1ddc546a57ac78b28893ee1013266a"
 
 http_archive(
     name = "com_google_disco_to_proto3_converter",

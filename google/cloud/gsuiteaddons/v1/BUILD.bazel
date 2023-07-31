@@ -22,7 +22,6 @@ load(
     "go_gapic_assembly_pkg",
     "go_gapic_library",
     "go_proto_library",
-    "go_test",
     "java_gapic_assembly_gradle_pkg",
     "java_gapic_library",
     "java_gapic_test",
@@ -32,7 +31,6 @@ load(
     "nodejs_gapic_library",
     "php_gapic_assembly_pkg",
     "php_gapic_library",
-    "php_grpc_library",
     "php_proto_library",
     "proto_library_with_info",
     "py_gapic_assembly_pkg",
@@ -157,18 +155,12 @@ go_gapic_library(
     ],
 )
 
-go_test(
-    name = "gsuiteaddons_go_gapic_test",
-    srcs = [":gsuiteaddons_go_gapic_srcjar_test"],
-    embed = [":gsuiteaddons_go_gapic"],
-    importpath = "cloud.google.com/go/gsuiteaddons/apiv1",
-)
-
 # Open Source Packages
 go_gapic_assembly_pkg(
     name = "gapi-cloud-gsuiteaddons-v1-go",
     deps = [
         ":gsuiteaddons_go_gapic",
+        ":gsuiteaddons_go_gapic_srcjar-snippets.srcjar",
         ":gsuiteaddons_go_gapic_srcjar-test.srcjar",
         ":gsuiteaddons_go_proto",
     ],
@@ -218,23 +210,15 @@ php_proto_library(
     deps = [":gsuiteaddons_proto"],
 )
 
-php_grpc_library(
-    name = "gsuiteaddons_php_grpc",
-    srcs = [":gsuiteaddons_proto"],
-    deps = [":gsuiteaddons_php_proto"],
-)
-
 php_gapic_library(
     name = "gsuiteaddons_php_gapic",
     srcs = [":gsuiteaddons_proto_with_info"],
     grpc_service_config = "gsuiteaddons_grpc_service_config.json",
+    migration_mode = "MIGRATING",
     rest_numeric_enums = True,
     service_yaml = "gsuiteaddons_v1.yaml",
     transport = "grpc+rest",
-    deps = [
-        ":gsuiteaddons_php_grpc",
-        ":gsuiteaddons_php_proto",
-    ],
+    deps = [":gsuiteaddons_php_proto"],
 )
 
 # Open Source Packages
@@ -242,7 +226,6 @@ php_gapic_assembly_pkg(
     name = "google-cloud-gsuiteaddons-v1-php",
     deps = [
         ":gsuiteaddons_php_gapic",
-        ":gsuiteaddons_php_grpc",
         ":gsuiteaddons_php_proto",
     ],
 )
@@ -297,7 +280,7 @@ ruby_cloud_gapic_library(
         "ruby-cloud-api-shortname=gsuiteaddons",
         "ruby-cloud-namespace-override=GsuiteAddOns=GSuiteAddOns",
         "ruby-cloud-path-override=g_suite_add_ons=gsuite_add_ons",
-        "ruby-cloud-extra-dependencies=google-apps-script-type=> 0.0|< 2.a",
+        "ruby-cloud-extra-dependencies=google-apps-script-type=>0.0+<2.a",
     ],
     grpc_service_config = "gsuiteaddons_grpc_service_config.json",
     rest_numeric_enums = True,
