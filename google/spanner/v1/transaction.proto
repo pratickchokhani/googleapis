@@ -480,6 +480,21 @@ message TransactionOptions {
   }
 }
 
+// Next transaction token and TTL applied on the token.
+message NextTransactionToken {
+  // Token used to identify the transaction to be created next. Used in
+  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
+  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
+  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
+  bytes token = 1;
+
+  // Token used to identify the transaction to be created next. Used in
+  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
+  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
+  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
+  int64 ttl_millis = 2;
+}
+
 // A transaction.
 message Transaction {
   // `id` may be used to identify the transaction in subsequent
@@ -503,7 +518,7 @@ message Transaction {
   // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
   // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
   // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
-  bytes next_transaction_token = 3;
+  NextTransactionToken next_transaction_token = 3;
 }
 
 // This message is used to select the transaction in which a
