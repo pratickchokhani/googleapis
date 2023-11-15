@@ -23,6 +23,7 @@ proto_library(
     srcs = [
         "common.proto",
         "hub.proto",
+        "policy_based_routing.proto",
     ],
     deps = [
         "//google/api:annotations_proto",
@@ -41,6 +42,8 @@ proto_library_with_info(
     deps = [
         ":networkconnectivity_proto",
         "//google/cloud:common_resources_proto",
+        "//google/cloud/location:location_proto",
+        "//google/iam/v1:iam_policy_proto",
     ],
 )
 
@@ -75,12 +78,16 @@ java_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "networkconnectivity_v1.yaml",
     test_deps = [
+        "//google/cloud/location:location_java_grpc",
+        "//google/iam/v1:iam_java_grpc",
         ":networkconnectivity_java_grpc",
     ],
     transport = "grpc",
     deps = [
         ":networkconnectivity_java_proto",
         "//google/api:api_java_proto",
+        "//google/cloud/location:location_java_proto",
+        "//google/iam/v1:iam_java_proto",
     ],
 )
 
@@ -88,6 +95,7 @@ java_gapic_test(
     name = "networkconnectivity_java_gapic_test_suite",
     test_classes = [
         "com.google.cloud.networkconnectivity.v1.HubServiceClientTest",
+        "com.google.cloud.networkconnectivity.v1.PolicyBasedRoutingServiceClientTest",
     ],
     runtime_deps = [":networkconnectivity_java_gapic_test"],
 )
@@ -176,7 +184,9 @@ py_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "networkconnectivity_v1.yaml",
     transport = "grpc",
-    deps = ["//google/iam/v1:iam_policy_py_proto"],
+    deps = [
+        "//google/iam/v1:iam_policy_py_proto",
+    ],
 )
 
 py_test(
@@ -220,7 +230,9 @@ php_gapic_library(
     rest_numeric_enums = True,
     service_yaml = "networkconnectivity_v1.yaml",
     transport = "grpc+rest",
-    deps = [":networkconnectivity_php_proto"],
+    deps = [
+        ":networkconnectivity_php_proto",
+    ],
 )
 
 # Open Source Packages

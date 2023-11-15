@@ -17,6 +17,7 @@ types:
 - name: google.cloud.dataplex.v1.DataQualityScanRuleResult
 - name: google.cloud.dataplex.v1.DataScanEvent
 - name: google.cloud.dataplex.v1.DiscoveryEvent
+- name: google.cloud.dataplex.v1.GovernanceEvent
 - name: google.cloud.dataplex.v1.JobEvent
 - name: google.cloud.dataplex.v1.OperationMetadata
 - name: google.cloud.dataplex.v1.SessionEvent
@@ -53,27 +54,6 @@ documentation:
       permission-aware UIs and command-line tools, not for authorization
       checking. This operation may "fail open" without warning.
 
-backend:
-  rules:
-  - selector: 'google.cloud.dataplex.v1.ContentService.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dataplex.v1.DataScanService.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dataplex.v1.DataTaxonomyService.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dataplex.v1.DataplexService.*'
-    deadline: 60.0
-  - selector: 'google.cloud.dataplex.v1.MetadataService.*'
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.GetLocation
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.ListLocations
-    deadline: 60.0
-  - selector: 'google.iam.v1.IAMPolicy.*'
-    deadline: 60.0
-  - selector: 'google.longrunning.Operations.*'
-    deadline: 60.0
-
 http:
   rules:
   - selector: google.cloud.location.Locations.GetLocation
@@ -94,6 +74,7 @@ http:
     - get: '/v1/{resource=projects/*/locations/*/entryTypes/*}:getIamPolicy'
     - get: '/v1/{resource=projects/*/locations/*/aspectTypes/*}:getIamPolicy'
     - get: '/v1/{resource=projects/*/locations/*/entryGroups/*}:getIamPolicy'
+    - get: '/v1/{resource=projects/*/locations/*/governanceRules/*}:getIamPolicy'
   - selector: google.iam.v1.IAMPolicy.SetIamPolicy
     post: '/v1/{resource=projects/*/locations/*/lakes/*}:setIamPolicy'
     body: '*'
@@ -120,6 +101,8 @@ http:
       body: '*'
     - post: '/v1/{resource=projects/*/locations/*/entryGroups/*}:setIamPolicy'
       body: '*'
+    - post: '/v1/{resource=projects/*/locations/*/governanceRules/*}:setIamPolicy'
+      body: '*'
   - selector: google.iam.v1.IAMPolicy.TestIamPermissions
     post: '/v1/{resource=projects/*/locations/*/lakes/*}:testIamPermissions'
     body: '*'
@@ -145,6 +128,8 @@ http:
     - post: '/v1/{resource=projects/*/locations/*/aspectTypes/*}:testIamPermissions'
       body: '*'
     - post: '/v1/{resource=projects/*/locations/*/entryGroups/*}:testIamPermissions'
+      body: '*'
+    - post: '/v1/{resource=projects/*/locations/*/governanceRules/*}:testIamPermissions'
       body: '*'
   - selector: google.longrunning.Operations.CancelOperation
     post: '/v1/{name=projects/*/locations/*/operations/*}:cancel'

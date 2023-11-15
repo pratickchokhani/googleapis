@@ -195,6 +195,12 @@ message CustomJobSpec {
   //   * AIP_TENSORBOARD_LOG_DIR = `<base_output_directory>/<trial_id>/logs/`
   GcsDestination base_output_directory = 6;
 
+  // The ID of the location to store protected artifacts. e.g. us-central1.
+  // Populate only when the location is different than CustomJob location.
+  // List of supported locations:
+  // https://cloud.google.com/vertex-ai/docs/general/locations
+  string protected_artifact_location_id = 19;
+
   // Optional. The name of a Vertex AI
   // [Tensorboard][google.cloud.aiplatform.v1beta1.Tensorboard] resource to
   // which this CustomJob will upload Tensorboard logs. Format:
@@ -332,4 +338,9 @@ message Scheduling {
   // This feature can be used by distributed training jobs that are not
   // resilient to workers leaving and joining a job.
   bool restart_job_on_worker_restart = 3;
+
+  // Optional. Indicates if the job should retry for internal errors after the
+  // job starts running. If true, overrides
+  // `Scheduling.restart_job_on_worker_restart` to false.
+  bool disable_retries = 5 [(google.api.field_behavior) = OPTIONAL];
 }

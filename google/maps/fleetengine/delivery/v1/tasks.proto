@@ -23,6 +23,7 @@ import "google/maps/fleetengine/delivery/v1/delivery_vehicles.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
+option csharp_namespace = "Google.Maps.FleetEngine.Delivery.V1";
 option go_package = "cloud.google.com/go/maps/fleetengine/delivery/apiv1/deliverypb;deliverypb";
 option java_multiple_files = true;
 option java_outer_classname = "Tasks";
@@ -229,6 +230,7 @@ message TaskTrackingViewConfig {
   // The option message that defines when a data element should be visible to
   // the end users.
   message VisibilityOption {
+    // The specific visibility option chosen.
     oneof visibility_option {
       // This data element is visible to the end users if the remaining stop
       // count <= remaining_stop_count_threshold.

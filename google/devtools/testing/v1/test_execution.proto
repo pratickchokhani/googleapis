@@ -239,6 +239,9 @@ message TestSpecification {
 
     // An iOS application with a test loop.
     IosTestLoop ios_test_loop = 15;
+
+    // An iOS Robo test.
+    IosRoboTest ios_robo_test = 17;
   }
 
   // Disables video recording. May reduce test latency.
@@ -269,7 +272,8 @@ message TestSetup {
   // storage path prefix for that device.
   repeated string directories_to_pull = 2;
 
-  // APKs to install in addition to those being directly tested.
+  // APKs to install in addition to those being directly tested. These will be
+  // installed after the app under test.
   // Currently capped at 100.
   repeated Apk additional_apks = 3;
 
@@ -513,6 +517,21 @@ message IosTestLoop {
 
   // Output only. The bundle id for the application under test.
   string app_bundle_id = 3;
+}
+
+// A test that explores an iOS application on an iOS device.
+message IosRoboTest {
+  // Required. The ipa stored at this file should be used to run the test.
+  FileReference app_ipa = 1 [(google.api.field_behavior) = REQUIRED];
+
+  // The bundle ID for the app-under-test.
+  // This is determined by examining the application's "Info.plist" file.
+  string app_bundle_id = 4;
+
+  // An optional Roboscript to customize the crawl. See
+  // https://firebase.google.com/docs/test-lab/android/robo-scripts-reference
+  // for more information about Roboscripts.
+  FileReference robo_script = 5;
 }
 
 // A test of an Android application that can control an Android component
@@ -1243,7 +1262,7 @@ message UniformSharding {
   // Required. The total number of shards to create. This must always be a
   // positive number that is no greater than the total number of test cases.
   // When you select one or more physical devices, the number of shards must be
-  // <= 50. When you select one or more ARM virtual devices, it must be <= 100.
+  // <= 50. When you select one or more ARM virtual devices, it must be <= 200.
   // When you select only x86 virtual devices, it must be <= 500.
   int32 num_shards = 1;
 }
@@ -1258,7 +1277,7 @@ message ManualSharding {
   // each manually-created shard. You must specify at least one shard if this
   // field is present. When you select one or more physical devices, the number
   // of repeated test_targets_for_shard must be <= 50. When you select one or
-  // more ARM virtual devices, it must be <= 100. When you select only x86
+  // more ARM virtual devices, it must be <= 200. When you select only x86
   // virtual devices, it must be <= 500.
   repeated TestTargetsForShard test_targets_for_shard = 1;
 }
@@ -1310,7 +1329,7 @@ message SmartSharding {
   //
   // Note that there is a limit for maximum number of shards. When you select
   // one or more physical devices, the number of shards must be <= 50. When you
-  // select one or more ARM virtual devices, it must be <= 100. When you select
+  // select one or more ARM virtual devices, it must be <= 200. When you select
   // only x86 virtual devices, it must be <= 500. To guarantee at least one test
   // case for per shard, the number of shards will not exceed the number of test
   // cases. Each shard created counts toward daily test quota.

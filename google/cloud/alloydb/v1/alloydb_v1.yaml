@@ -56,19 +56,6 @@ documentation:
       permission-aware UIs and command-line tools, not for authorization
       checking. This operation may "fail open" without warning.
 
-backend:
-  rules:
-  - selector: 'google.cloud.alloydb.v1.AlloyDBAdmin.*'
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.GetLocation
-    deadline: 60.0
-  - selector: google.cloud.location.Locations.ListLocations
-    deadline: 60.0
-  - selector: 'google.iam.v1.IAMPolicy.*'
-    deadline: 60.0
-  - selector: 'google.longrunning.Operations.*'
-    deadline: 60.0
-
 http:
   rules:
   - selector: google.cloud.location.Locations.GetLocation
@@ -118,74 +105,6 @@ publishing:
   library_settings:
   - version: google.cloud.alloydb.v1
     launch_stage: GA
-    java_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    cpp_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    php_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    python_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    node_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    dotnet_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    ruby_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    go_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-  - version: google.cloud.alloydb.v1beta
-    launch_stage: BETA
-    java_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    cpp_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    php_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    python_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    node_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    dotnet_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    ruby_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-    go_settings:
-      common:
-        destinations:
-        - PACKAGE_MANAGER
-  - version: google.cloud.alloydb.v1alpha
-    launch_stage: ALPHA
     java_settings:
       common:
         destinations:

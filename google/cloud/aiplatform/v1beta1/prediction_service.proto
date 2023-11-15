@@ -108,6 +108,19 @@ service PredictionService {
     option (google.api.method_signature) =
         "endpoint,instances,parameters,deployed_model_id";
   }
+
+  // Perform a token counting.
+  rpc CountTokens(CountTokensRequest) returns (CountTokensResponse) {
+    option (google.api.http) = {
+      post: "/v1beta1/{endpoint=projects/*/locations/*/endpoints/*}:countTokens"
+      body: "*"
+      additional_bindings {
+        post: "/v1beta1/{endpoint=projects/*/locations/*/publishers/*/models/*}:countTokens"
+        body: "*"
+      }
+    };
+    option (google.api.method_signature) = "endpoint,instances";
+  }
 }
 
 // Request message for
@@ -291,6 +304,16 @@ message ExplainRequest {
   //  - Using different baselines for explaining the prediction results.
   ExplanationSpecOverride explanation_spec_override = 5;
 
+  // Optional. This field is the same as the one above, but supports multiple
+  // explanations to occur in parallel. The key can be any string. Each override
+  // will be run against the model, then its explanations will be grouped
+  // together.
+  //
+  // Note - these explanations are run **In Addition** to the default
+  // Explanation in the deployed model.
+  map<string, ExplanationSpecOverride> concurrent_explanation_spec_override = 6
+      [(google.api.field_behavior) = OPTIONAL];
+
   // If specified, this ExplainRequest will be served by the chosen
   // DeployedModel, overriding
   // [Endpoint.traffic_split][google.cloud.aiplatform.v1beta1.Endpoint.traffic_split].
@@ -300,6 +323,17 @@ message ExplainRequest {
 // Response message for
 // [PredictionService.Explain][google.cloud.aiplatform.v1beta1.PredictionService.Explain].
 message ExplainResponse {
+  // This message is a wrapper grouping Concurrent Explanations.
+  message ConcurrentExplanation {
+    // The explanations of the Model's
+    // [PredictResponse.predictions][google.cloud.aiplatform.v1beta1.PredictResponse.predictions].
+    //
+    // It has the same number of elements as
+    // [instances][google.cloud.aiplatform.v1beta1.ExplainRequest.instances] to
+    // be explained.
+    repeated Explanation explanations = 1;
+  }
+
   // The explanations of the Model's
   // [PredictResponse.predictions][google.cloud.aiplatform.v1beta1.PredictResponse.predictions].
   //
@@ -308,6 +342,10 @@ message ExplainResponse {
   // explained.
   repeated Explanation explanations = 1;
 
+  // This field stores the results of the explanations run in parallel with
+  // The default explanation strategy/method.
+  map<string, ConcurrentExplanation> concurrent_explanations = 4;
+
   // ID of the Endpoint's DeployedModel that served this explanation.
   string deployed_model_id = 2;
 
@@ -315,4 +353,34 @@ message ExplainResponse {
   // Same as
   // [PredictResponse.predictions][google.cloud.aiplatform.v1beta1.PredictResponse.predictions].
   repeated google.protobuf.Value predictions = 3;
+}
+
+// Request message for
+// [PredictionService.CountTokens][google.cloud.aiplatform.v1beta1.PredictionService.CountTokens].
+message CountTokensRequest {
+  // Required. The name of the Endpoint requested to perform token counting.
+  // Format:
+  // `projects/{project}/locations/{location}/endpoints/{endpoint}`
+  string endpoint = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference) = {
+      type: "aiplatform.googleapis.com/Endpoint"
+    }
+  ];
+
+  // Required. The instances that are the input to token counting call.
+  // Schema is identical to the prediction schema of the underlying model.
+  repeated google.protobuf.Value instances = 2
+      [(google.api.field_behavior) = REQUIRED];
+}
+
+// Response message for
+// [PredictionService.CountTokens][google.cloud.aiplatform.v1beta1.PredictionService.CountTokens].
+message CountTokensResponse {
+  // The total number of tokens counted across all instances from the request.
+  int32 total_tokens = 1;
+
+  // The total number of billable characters counted across all instances from
+  // the request.
+  int32 total_billable_characters = 2;
 }

@@ -58,10 +58,15 @@ rules_jvm_external_setup()
 
 # Python rules should go early in the dependencies list, otherwise a wrong
 # version of the library will be selected as a transitive dependency of gRPC.
+_rules_python_version = "0.26.0"
+
+_rules_python_sha256 = "9d04041ac92a0985e344235f5d946f71ac543f1b1565f2cdbc9a2aaee8adf55b"
+
 http_archive(
     name = "rules_python",
-    strip_prefix = "rules_python-0.9.0",
-    url = "https://github.com/bazelbuild/rules_python/archive/0.9.0.tar.gz",
+    sha256 = _rules_python_sha256,
+    strip_prefix = "rules_python-{}".format(_rules_python_version),
+    url = "https://github.com/bazelbuild/rules_python/archive/{}.tar.gz".format(_rules_python_version),
 )
 
 http_archive(
@@ -189,13 +194,11 @@ rules_proto_toolchains()
 # rules_gapic also depends on rules_go, so it must come after our own dependency on rules_go.
 # It must also come before gapic-generator-go so as to ensure that it does not bring in an old
 # version of rules_gapic.
-_rules_gapic_version = "0.28.1"
+_rules_gapic_version = "0.29.4"
 
-_rules_gapic_sha256 = "913d88485702c6605ff481678a63cfd710877252a74ff9181bf0452515039625"
 
 http_archive(
     name = "rules_gapic",
-    sha256 = _rules_gapic_sha256,
     strip_prefix = "rules_gapic-%s" % _rules_gapic_version,
     urls = ["https://github.com/googleapis/rules_gapic/archive/v%s.tar.gz" % _rules_gapic_version],
 )
@@ -222,7 +225,7 @@ local_repository(
     path = ".",
 )
 
-_gapic_generator_go_version = "0.37.2"
+_gapic_generator_go_version = "0.39.3"
 
 http_archive(
     name = "com_googleapis_gapic_generator_go",
@@ -270,7 +273,7 @@ maven_install(
     ],
 )
 
-_gapic_generator_java_version = "2.23.1"
+_gapic_generator_java_version = "2.29.0"
 
 maven_install(
     artifacts = [
@@ -319,11 +322,7 @@ load("@rules_gapic//python:py_gapic_repositories.bzl", "py_gapic_repositories")
 
 py_gapic_repositories()
 
-load("@rules_python//python:pip.bzl", "pip_install")
-
-pip_install()
-
-_gapic_generator_python_version = "1.11.4"
+_gapic_generator_python_version = "1.11.11"
 
 http_archive(
     name = "gapic_generator_python",
@@ -337,6 +336,21 @@ load(
     "gapic_generator_register_toolchains",
 )
 
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+    name = "gapic_generator_python_pip_deps",
+    requirements_lock = "@gapic_generator_python//:requirements.txt",
+)
+
+load("@gapic_generator_python_pip_deps//:requirements.bzl", "install_deps")
+
+install_deps()
+
 gapic_generator_python()
 
 gapic_generator_register_toolchains()
@@ -345,9 +359,9 @@ gapic_generator_register_toolchains()
 # TypeScript
 ##############################################################################
 
-_gapic_generator_typescript_version = "4.0.0"
+_gapic_generator_typescript_version = "4.2.0"
 
-_gapic_generator_typescript_sha256 = "eb413468838f682eb4a7732f83f59a42a46810f572c0cb54390807763e96c3c4"
+_gapic_generator_typescript_sha256 = "bcf2dcdc112f1a8bf24f0ab3b36c10bbf9a7bab22d947ca9cfb7f613fa6992ab"
 
 ### TypeScript generator
 http_archive(
@@ -390,7 +404,7 @@ pnpm_repository(name = "pnpm")
 ##############################################################################
 
 # PHP micro-generator
-_gapic_generator_php_version = "1.8.0"
+_gapic_generator_php_version = "1.9.2"
 
 http_archive(
     name = "gapic_generator_php",
@@ -442,9 +456,9 @@ gapic_generator_csharp_repositories()
 # Ruby
 ##############################################################################
 
-_gapic_generator_ruby_version = "v0.24.0"
+_gapic_generator_ruby_version = "v0.25.1"
 
-_gapic_generator_ruby_sha256 = "832ce2e58d1991521543ab16eb5fef12824e332985f9e3cd75c9af458cbee632"
+_gapic_generator_ruby_sha256 = "660557adb81ba217fd61dd634557acc40bbdd147a1b44127d19dc80e2a850463"
 
 http_archive(
     name = "gapic_generator_ruby",
@@ -461,7 +475,7 @@ gapic_generator_ruby_repositories()
 # Discovery
 ##############################################################################
 
-_disco_to_proto3_converter_version = "96e1e63d3c1ddc546a57ac78b28893ee1013266a"
+_disco_to_proto3_converter_version = "86444dbff202cf16c80eda1ae9bd1e5d54d4915d"
 
 http_archive(
     name = "com_google_disco_to_proto3_converter",

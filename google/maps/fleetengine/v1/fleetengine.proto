@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 import "google/type/latlng.proto";
 
+option csharp_namespace = "Google.Maps.FleetEngine.V1";
 option go_package = "cloud.google.com/go/maps/fleetengine/apiv1/fleetenginepb;fleetenginepb";
 option java_multiple_files = true;
 option java_outer_classname = "FleetEngine";
@@ -169,6 +170,24 @@ message VehicleAttribute {
 
   // The attribute's value.
   string value = 2;
+
+  // The attribute's value, can be in string, bool, or double type.
+  oneof vehicle_attribute_value {
+    // String typed attribute value.
+    //
+    // Note: This is identical to the `value` field which will eventually be
+    // deprecated. For create or update methods, either field can be used, but
+    // it's strongly recommended to use `string_value`. If both `string_value`
+    // and `value` are set, they must be identical or an error will be thrown.
+    // Both fields are populated in responses.
+    string string_value = 3;
+
+    // Boolean typed attribute value.
+    bool bool_value = 4;
+
+    // Double typed attribute value.
+    double number_value = 5;
+  }
 }
 
 // The location, speed, and heading of a vehicle at a point in time.
@@ -251,7 +270,7 @@ message VehicleLocation {
   // Timestamp associated with the raw location.
   google.protobuf.Timestamp raw_location_time = 17;
 
-  // Source of the raw location.
+  // Source of the raw location. Defaults to `GPS`.
   LocationSensor raw_location_sensor = 28;
 
   // Accuracy of `raw_location` as a radius, in meters.
@@ -263,7 +282,8 @@ message VehicleLocation {
   // Timestamp associated with the supplemental location.
   google.protobuf.Timestamp supplemental_location_time = 19;
 
-  // Source of the supplemental location.
+  // Source of the supplemental location. Defaults to
+  // `CUSTOMER_SUPPLIED_LOCATION`.
   LocationSensor supplemental_location_sensor = 20;
 
   // Accuracy of `supplemental_location` as a radius, in meters.
