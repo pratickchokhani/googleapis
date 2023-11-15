@@ -763,6 +763,19 @@ message ExecuteSqlRequest {
   // Common options for this request.
   RequestOptions request_options = 11;
 
+  // If set to true, attempts to commit the enclosing read-write transaction
+  // after executing the SQL statement `sql`. The requirements of using
+  // `autocommit` are: (a) `sql` is a DML statement, and (b) either
+  // `transaction` includes the id of a ReadWrite transaction or
+  // `TransactionOptions` includes a `next_transaction_token`. If the commit is
+  // successful, the returned `ResultSet` will include a `commit_response`,
+  // indicating that a separate commit is not needed. In case of failure to
+  // commit, `commit_response` will be not be present in the `ResultSet`,
+  // indicating that a separate call to [Commit][Spanner.Commit] will be
+  // required to commit the transaction. If `autocommit` is set, than no
+  // subsequent DML requests will be accepted in this transaction.
+  bool autocommit = 12;
+
   // Directed read options for this request.
   DirectedReadOptions directed_read_options = 15;
 

@@ -378,8 +378,13 @@ message TransactionOptions {
 
     // Read lock mode for the transaction.
     ReadLockMode read_lock_mode = 1;
-    // Identity of the transaction to be created. Applicable only for begin or
-    // inline begin requests. All subsequent requests should use `id`
+
+    // An opaque identifier representing the next transaction created in a
+    // session. Applicable only for APIs that start a read-write transaction via
+    // [TransactionSelector.begin]: [Read][Spanner.Read],
+    // [StreamingRead][Spanner.StreamingRead], [ExecuteSql][Spanner.ExecuteSql],
+    // and [ExecuteStreamingSql][Spanner.ExecuteStreamingSql]. All subsequent
+    // requests should use [Transaction][id].
     bytes next_transaction_token = 2;
   }
 
@@ -478,21 +483,29 @@ message TransactionOptions {
     // on the `session` resource.
     ReadOnly read_only = 2;
   }
+
+  // If true, the Cloud Spanner will include `next_transaction_token` in the
+  // [Transaction][] message that identifies the subsequent transaction.
+  bool return_next_transaction_token = 4;
 }
 
-// Next transaction token and TTL applied on the token.
+// Next transaction token and the TTL that should be applied to the token.
 message NextTransactionToken {
-  // Token used to identify the transaction to be created next. Used in
-  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
-  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
-  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
+  // An opaque identifier representing the next transaction created in a
+  // session.`token` can be passed as the
+  // [TransactionOptions.ReadWrite.next_transaction_token] in an
+  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] request, allowing a
+  // transaction to be both started and committed in a single request when
+  // [ExecuteSql.autocommit][google.spanner.v1.Spanner.ExecuteSql.autocommit] is
+  // enabled. `token` should only be used before `ttl`. Using `token` post
+  // expiration may generate an error.
   bytes token = 1;
 
-  // Token used to identify the transaction to be created next. Used in
-  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
-  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
-  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
-  int64 ttl_millis = 2;
+  // Time to live (TTL) of the `token` in milliseconds to be applied by client.
+  // `token` is only applicable for the duration specified in `ttl`. 'ttl' will
+  // start when the response in received. It can be refreshed on a successful
+  // commit.
+  google.protobuf.Duration ttl = 2;
 }
 
 // A transaction.
@@ -514,10 +527,18 @@ message Transaction {
   // A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
   // Example: `"2014-10-02T15:01:23.045123456Z"`.
   google.protobuf.Timestamp read_timestamp = 2;
-  // Token used to identify the transaction to be created next. Used in
-  // [BeginTransaction][google.spanner.v1.Spanner.BeginTransaction]
-  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] in case of inline begin
-  // [Commit][google.spanner.v1.Spanner.Commit] in case of single use transaction
+
+  // The next transaction token and its TTL in milliseconds. A next transaction
+  // token will be returned in response to APIs that create a transaction.
+  // When a request such as
+  // [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] both starts and commits
+  // a transaction, the next transaction token should be passed in
+  // [TransactionOptions][ReadWrite.next_transaction_token][].
+  // `next_transaction_token` is only applicable for the duration specified in
+  // the [ttl][NextTransactionToken.ttl]. Using
+  // `next_transaction_token` post expiration may result in an error response.
+  // Not returned by default: see
+  // [TransactionOptions.return_next_transaction_token][].
   NextTransactionToken next_transaction_token = 3;
 }
 
